@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem jimpitan digital DUKUH sawit- ngemplak Rt01/03</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        :root { --primary: #1b5e20; --accent: #43a047; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; }
+        [data-bs-theme="dark"] { --bg: #020617; --card: #1e293b; --text: #f1f5f9; }
+        
+        body { background-color: var(--bg); color: var(--text); font-family: 'Urbanist', sans-serif; min-height: 100vh; margin: 0; overflow-x: hidden; }
+        
+        .brand-title { font-weight: 900; letter-spacing: -1px; font-size: 1.1rem; background: linear-gradient(to right, #fff, #a5d6a7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; line-height: 1.2; }
+        .navbar { background: var(--primary) !important; padding: 12px; border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 1000; }
+        
+        #notif { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10000; display: none; width: 85%; max-width: 400px; padding: 12px; border-radius: 12px; text-align: center; font-weight: 700; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+        .card { background-color: var(--card); border: none; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 16px; }
+        .time-box { font-size: 2.5rem; font-weight: 900; color: var(--primary); letter-spacing: -2px; }
+        
+        .stat-card { padding: 15px; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+        .stat-val { font-size: 1.4rem; font-weight: 900; color: var(--primary); }
+        .stat-label { font-size: 0.65rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+
+        .btn-sync-new { background: #e8f5e9; color: var(--primary); border: 2px solid #a5d6a7; padding: 10px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.8rem; transition: 0.3s; cursor: pointer; }
+        .btn-sync-new:active { background: #c8e6c9; transform: scale(0.95); }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .menu-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid rgba(0,0,0,0.05); cursor: pointer; }
+        .menu-item i { font-size: 1.5rem; margin-bottom: 5px; display: block; }
+
+        .activity-box { padding: 20px; }
+        .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-info b { font-size: 0.9rem; display: block; }
+        .activity-info small { font-size: 0.7rem; color: #64748b; }
+        .activity-amount { font-weight: 800; color: var(--primary); font-size: 0.95rem; }
+
+        #reader { width: 100%; max-width: 400px; margin: auto; border-radius: 15px; overflow: hidden; background: #000; }
+        footer { text-align: center; padding: 20px; font-size: 0.7rem; font-weight: 600; color: #94a3b8; }
+        .theme-toggle { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 15px; background: var(--primary); color: white; border: none; z-index: 999; }
+        
+        .btn-logout-dash { font-size: 0.7rem; font-weight: 800; padding: 5px 12px; border-radius: 50px; margin-left: 10px; vertical-align: middle; }
+    </style>
+</head>
+<body data-bs-theme="light">
+
+<div id="notif"></div>
+<button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-adjust"></i></button>
+
+<nav class="navbar navbar-dark text-center">
+    <div class="container-fluid d-flex align-items-center">
+        <button id="navBackBtn" class="btn p-0 text-white" style="display:none; width: 30px;" onclick="backToDash()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="mx-auto">
+            <div class="brand-title">Sistem jimpitan digital</div>
+            <div style="font-size: 0.6rem; color: #a5d6a7; font-weight: 700; letter-spacing: 1px;">DUKUH SAWIT-NGEMPLAK RT01/03</div>
+        </div>
+        <div id="spacer" style="width: 30px;"></div>
+    </div>
+</nav>
+
+<div class="container mt-3">
+    <!-- LOGIN SECTION -->
+    <div id="login-section">
+        <div class="card p-4 text-center">
+            <h6 class="fw-bold text-muted mb-3">AKSES PETUGAS</h6>
+            <input type="number" id="uniqueCode" class="form-control text-center fs-2 mb-3 py-3 rounded-4" placeholder="••••">
+            <button class="btn btn-success w-100 py-3 rounded-4 fw-bold" onclick="login()">MASUK</button>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="main-dashboard" style="display:none;">
+        <div class="card p-4 text-center">
+            <div id="liveTime" class="time-box">00:00</div>
+            <div id="liveDate" class="text-muted small fw-bold">---</div>
+            <div class="mt-3">
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold" id="namaPetugasDash">-</span>
+                <button class="btn btn-danger btn-logout-dash" onclick="logout()"><i class="fas fa-sign-out-alt me-1"></i> LOGOUT</button>
+            </div>
+        </div>
+
+        <div class="row g-2 mb-3">
+            <div class="col-4">
+                <div class="card stat-card"><span class="stat-label">Petugas</span><span id="petugasCount" class="stat-val">0</span></div>
+            </div>
+            <div class="col-4">
+                <div class="card stat-card"><span class="stat-label">Total Kas</span><span id="totalKasDash" class="stat-val" style="font-size: 0.8rem;">0</span></div>
+            </div>
+            <div class="col-4">
+                <div class="card stat-card p-2"><button class="btn-sync-new" onclick="muatDataCloud()"><i class="fas fa-sync-alt d-block mb-1"></i> SINKRON</button></div>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showMenu('transaksi')"><i class="fas fa-qrcode text-success"></i><span class="fw-bold" style="font-size: 0.65rem;">Input Data</span></div>
+            <div class="menu-item" onclick="showMenu('rekap')"><i class="fas fa-wallet text-primary"></i><span class="fw-bold" style="font-size: 0.65rem;">Rekap Saldo</span></div>
+            <div class="menu-item" onclick="showMenu('panduan')"><i class="fas fa-info-circle text-info"></i><span class="fw-bold" style="font-size: 0.65rem;">Bantuan</span></div>
+        </div>
+
+        <div class="card activity-box">
+            <h6 class="fw-900 mb-3" style="font-size: 0.85rem; color: var(--primary);"><i class="fas fa-bolt me-2"></i>AKTIVITAS TERBARU</h6>
+            <div id="listAktivitasDashboard"></div>
+        </div>
+    </div>
+
+    <!-- MENU: TRANSAKSI -->
+    <div id="menu-transaksi" class="menu-content" style="display:none;">
+        <div class="card p-3">
+            <div id="reader-wrapper" class="mb-3">
+                <div id="reader"></div>
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold text-muted">Nama Warga</label>
+                <input type="text" id="inputNama" class="form-control fw-bold" placeholder="Menunggu Scan...">
+            </div>
+            <div class="mb-3">
+                <label class="small fw-bold text-muted">Nominal</label>
+                <input type="number" id="inputNominal" class="form-control fs-3 fw-900 text-success" value="">
+            </div>
+            <button id="btnSimpan" class="btn btn-success w-100 py-3 fw-bold rounded-4" onclick="prosesSimpan()">SIMPAN DATA</button>
+        </div>
+    </div>
+
+    <!-- MENU: REKAP -->
+    <div id="menu-rekap" class="menu-content" style="display:none;">
+        <div class="card p-3">
+            <h6 class="fw-bold mb-3"><i class="fas fa-history me-2"></i>Riwayat Hari Ini</h6>
+            <div id="tabelRekapFull"></div>
+        </div>
+    </div>
+
+    <!-- MENU: BANTUAN -->
+    <div id="menu-panduan" class="menu-content" style="display:none;">
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3">Panduan Singkat</h6>
+            <p class="small text-muted">1. Scan QR warga untuk input otomatis.<br>2. Klik Simpan Data untuk mengirim ke sistem.<br>3. Klik Sinkron untuk melihat data terbaru.<br>4. Tombol Logout ada di dashboard.</p>
+            <button class="btn btn-outline-success w-100 rounded-pill" onclick="backToDash()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<footer>powered by <b>ACODE</b> design by Rony setiawan</footer>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw5SUfmo7LNSp33e-l07GWfGBzfvQBZ_MMHIqEm233tJbH9PdQ2vMo4LajgsaWoEKK_/exec'; 
+    const PIN_DB = { "1101": "GRUB 1 (nama petugas)", "1102": "GRUB 1 (nama petugas)", "2201": "GRUB 2 (nama petugas)", "2202": "GRUB 2 (nama petugas)"  };
+
+    let scanHistory = JSON.parse(localStorage.getItem('jimpitan_data')) || [];
+    let currentPetugas = "";
+    let html5QrCode = null;
+
+    function showNotif(msg, type = "success") {
+        const n = document.getElementById('notif');
+        n.innerText = msg; n.style.background = type === "success" ? "#1b5e20" : "#d32f2f";
+        n.style.display = 'block';
+        setTimeout(() => { n.style.display = 'none'; }, 2000);
+    }
+
+    function login() {
+        const p = document.getElementById('uniqueCode').value;
+        if(PIN_DB[p]) {
+            currentPetugas = PIN_DB[p];
+            document.getElementById('namaPetugasDash').innerText = currentPetugas;
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('main-dashboard').style.display = 'block';
+            document.getElementById('uniqueCode').value = "";
+            muatDataCloud();
+        } else { showNotif("PIN Salah!", "danger"); }
+    }
+
+    function logout() {
+        if(confirm("Keluar dari aplikasi?")) {
+            currentPetugas = "";
+            document.getElementById('main-dashboard').style.display = 'none';
+            document.querySelectorAll('.menu-content').forEach(x => x.style.display = 'none');
+            document.getElementById('navBackBtn').style.display = 'none';
+            document.getElementById('spacer').style.display = 'block';
+            document.getElementById('login-section').style.display = 'block';
+            showNotif("Berhasil Logout");
+        }
+    }
+
+    async function stopScanner() {
+        if (html5QrCode && html5QrCode.isScanning) {
+            await html5QrCode.stop();
+            await html5QrCode.clear();
+        }
+        html5QrCode = null;
+    }
+
+    async function showMenu(m) {
+        document.getElementById('main-dashboard').style.display = 'none';
+        document.querySelectorAll('.menu-content').forEach(x => x.style.display = 'none');
+        document.getElementById('menu-'+m).style.display = 'block';
+        document.getElementById('navBackBtn').style.display = 'block';
+        document.getElementById('spacer').style.display = 'none';
+        
+        if(m === 'transaksi') startScan();
+        if(m === 'rekap') renderRekap();
+    }
+
+    async function backToDash() {
+        await stopScanner();
+        document.querySelectorAll('.menu-content').forEach(x => x.style.display = 'none');
+        document.getElementById('main-dashboard').style.display = 'block';
+        document.getElementById('navBackBtn').style.display = 'none';
+        document.getElementById('spacer').style.display = 'block';
+        renderDashboard();
+    }
+
+    function startScan() {
+        if(!html5QrCode) { html5QrCode = new Html5Qrcode("reader"); }
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        
+        html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+            let cleanText = decodedText;
+            try {
+                if (decodedText.startsWith("http")) {
+                    const parts = decodedText.split('/');
+                    cleanText = parts[parts.length - 1] || parts[parts.length - 2];
+                }
+            } catch(e) { cleanText = decodedText; }
+
+            document.getElementById('inputNama').value = decodeURIComponent(cleanText).replace(/_/g, ' ');
+            showNotif("QR Terdeteksi!");
+            stopScanner();
+        }).catch(err => { console.error(err); });
+    }
+
+    async function prosesSimpan() {
+        const nmInput = document.getElementById('inputNama');
+        const nomInput = document.getElementById('inputNominal');
+        if(!nmInput.value) return showNotif("Scan dulu!", "danger");
+
+        const btn = document.getElementById('btnSimpan');
+        btn.disabled = true; btn.innerText = "Mengirim...";
+        
+        const waktu = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        const finalURL = `${scriptURL}?nama=${encodeURIComponent(nmInput.value)}&nominal=${nomInput.value}&waktu=${waktu}&petugas=${encodeURIComponent(currentPetugas)}`;
+
+        const img = new Image();
+        img.src = finalURL;
+        
+        setTimeout(() => {
+            showNotif("Tersimpan!");
+            nmInput.value = "";
+            btn.disabled = false; btn.innerText = "SIMPAN DATA";
+            backToDash();
+            muatDataCloud();
+        }, 1200);
+    }
+
+    async function muatDataCloud() {
+        try {
+            const res = await fetch(scriptURL);
+            const data = await res.json();
+            scanHistory = data;
+            localStorage.setItem('jimpitan_data', JSON.stringify(scanHistory));
+            renderDashboard();
+        } catch (e) { console.warn("Sync failed"); }
+    }
+
+    function renderDashboard() {
+        const petugasUnik = new Set(scanHistory.map(item => item.petugas));
+        document.getElementById('petugasCount').innerText = petugasUnik.size;
+        let total = scanHistory.reduce((acc, curr) => acc + parseInt(curr.nominal || 0), 0);
+        document.getElementById('totalKasDash').innerText = "Rp " + total.toLocaleString();
+        
+        const activityContainer = document.getElementById('listAktivitasDashboard');
+        if(scanHistory.length === 0) {
+            activityContainer.innerHTML = '<p class="text-center text-muted py-3 small">Belum ada data</p>';
+            return;
+        }
+        
+        let html = '';
+        scanHistory.slice(0, 5).forEach(i => {
+            html += `<div class="activity-item"><div class="activity-info"><b>${i.nama}</b><small>${i.waktu} • ${i.petugas}</small></div><div class="activity-amount">Rp ${parseInt(i.nominal).toLocaleString()}</div></div>`;
+        });
+        activityContainer.innerHTML = html;
+    }
+
+    function renderRekap() {
+        const container = document.getElementById('tabelRekapFull');
+        if(scanHistory.length === 0) { container.innerHTML = '<p class="text-center text-muted small">Kosong</p>'; return; }
+        let html = '<ul class="list-group list-group-flush">';
+        scanHistory.forEach(i => {
+            html += `<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 border-bottom"><div><small class="text-muted d-block" style="font-size:0.6rem">${i.waktu}</small><b class="small">${i.nama}</b></div><span class="fw-bold text-success small">Rp ${parseInt(i.nominal).toLocaleString()}</span></li>`;
+        });
+        container.innerHTML = html + '</ul>';
+    }
+
+    function toggleTheme() {
+        const b = document.body;
+        b.setAttribute('data-bs-theme', b.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light');
+    }
+
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+        document.getElementById('liveDate').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+    setInterval(updateTime, 1000); updateTime();
+</script>
+</body>
+</html>
